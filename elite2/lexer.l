@@ -45,7 +45,7 @@ typedef yy::Parser::token_type token_type;
 "!"                     return Parser::symbol_type( token_type('!'), loc );
 "::"                    return Parser::symbol_type( token::NSP, loc );
 
-
+":="                    return Parser::symbol_type( token::MOV, loc );
 "+="                    return Parser::symbol_type( token::PE, loc );
 "-="                    return Parser::symbol_type( token::SE, loc );
 "*="                    return Parser::symbol_type( token::ME, loc );
