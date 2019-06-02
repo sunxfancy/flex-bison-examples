@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project("reentrant-variant-cpp")
+project("elite")
 
 ## Flex/Bison configuration 
 find_package(BISON REQUIRED)
