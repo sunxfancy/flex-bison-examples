@@ -67,14 +67,7 @@ yy::Parser::symbol_type yylex(void* yyscanner, yy::location& loc);
 
 %%
 
-
-
 %start program;
-
-	/* define your grammars here use the same grammars 
-	 * you used in Phase 2 and modify their actions to generate codes
-	 * assume that your grammars start with program
-	 */
 
 program: FUNCTION;
 

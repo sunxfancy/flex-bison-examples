@@ -31,8 +31,15 @@
 	 * the rule to return token function.
 	 */
 
-function       {return yy::Parser::make_FUNCTION(loc);}
+function       	{return yy::Parser::make_FUNCTION(loc);}
 
+[ \n\r\t\v]		{}
+
+.				{std::cerr << loc << ": " << "token error" << std::endl; exit(1);}
+
+
+	/* if you didn't define #define yyterminate() at beginnign, you will need 
+	   this rule to match the end of file */
     /* <<EOF>>	{return yy::Parser::make_END(loc);} */
 	/* your rules end */
 
