@@ -3,7 +3,7 @@
 
 %{
 #include <iostream>
-#define YY_DECL yy::Parser::symbol_type yylex(yyscan_t yyscanner, yy::location& loc)
+#define YY_DECL yy::Parser::symbol_type yylex(yyscan_t yyscanner, yy::location& loc, class Elite::ParserCtx& ctx)
 
 #define YY_USER_ACTION loc.columns(yyleng);
 #define yyterminate() return Parser::make_END(loc)
@@ -98,6 +98,26 @@ typedef yy::Parser::token_type token_type;
 "@"                     return Parser::symbol_type( token_type('@'), loc );
 ",@"                    return Parser::symbol_type( token::MBK, loc );
 "`"                     return Parser::symbol_type( token_type('`'), loc );
+
+    /* 特殊运算符 */
+"new"                   return Parser::make_NEW(loc);
+"delete"                return Parser::make_DELETE(loc);
+
+    /* 特殊值 */
+"null"                  return Parser::make_NULL_T(loc);
+"true"                  return Parser::make_TRUE(loc);
+"false"                 return Parser::make_FALSE(loc);
+
+
+[a-zA-Z_][a-zA-Z0-9_]*  return Parser::make_ID(yytext, loc); /* 标识符 */
+
+-?[0-9]*\.[0-9]*        return Parser::make_DOUBLE(yytext, loc);
+-?[0-9]+                return Parser::make_INTEGER(yytext, loc);
+0x[0-9A-Fa-f]+          return Parser::make_INTEGER(yytext, loc);
+
+\"(\\.|[^\\"])*\"       return Parser::make_STRING(yytext, loc); /* 字符串 */
+@\"(\\.|[^\\"])*\"      return Parser::make_STRING(yytext, loc); /* 无转义字符串 */
+\'(\\.|.)\'             return Parser::make_CHAR(yytext, loc);   /* 字符 */
 
 .				{std::cerr << loc << ": " << "token error" << std::endl; exit(1);}
 

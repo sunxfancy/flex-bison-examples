@@ -46,7 +46,7 @@
 
 %code
 {
-yy::Parser::symbol_type yylex(void* yyscanner, yy::location& loc);
+yy::Parser::symbol_type yylex(void* yyscanner, yy::location& loc, class Elite::ParserCtx& ctx);
 }
 
 
@@ -59,6 +59,8 @@ yy::Parser::symbol_type yylex(void* yyscanner, yy::location& loc);
 %token '<' '>' '=' '+' '-' '*' '/' '%' '^' '&' '|' '~' '@' '?' ':'
 %token PP SS LF RF AND OR '!' NSP PE SE ME DE AE OE XE MODE FLE FRE SZ MOV
 
+%token CONST NEW DELETE
+%token TRUE FALSE NULL_T
 
 %left AE OE XE MODE FLE FRE
 %left PE SE    
@@ -78,7 +80,7 @@ yy::Parser::symbol_type yylex(void* yyscanner, yy::location& loc);
 /* The driver is passed by reference to the parser and to the scanner. This
  * provides a simple but effective pure interface, not relying on global
  * variables. */
-%lex-param {void *scanner} {yy::location& loc}
+%lex-param {void *scanner} {yy::location& loc} { class Elite::ParserCtx& ctx }
 %parse-param {void *scanner} {yy::location& loc} { class Elite::ParserCtx& ctx }
 
 
@@ -106,84 +108,87 @@ element
     | type
     ;
 
-types : ID { $$ = TypeNode::Create($1, false); }
-      | CONST ID { $$ = TypeNode::Create($2, true); }
-      | '*' ID { $$ = TypeNode::Create($2, false, true); }
-      | CONST '*' ID { $$ = TypeNode::Create($3, true, true); }
-      | types SZ { $$ = $1; ((TypeNode*)$1)->addDimension(); }
-      ;
+type
+    : ID 
+    | CONST ID 
+    | '*' ID 
+    | CONST '*' ID 
+    | type SZ 
+    ;
 
 numeric 
-	: INTEGER { $$ = IntNode::Create($1); }
-    | DOUBLE { $$ = FloatNode::Create($1); }
+	: INTEGER 
+    | DOUBLE 
     ;
 
 var_exp 
-	: ID { $$ = IDNode::Create($1); }
+	: ID 
     | numeric 
-    | STRING { $$ = StringNode::Create($1); }
-    | KWS_TSZ { $$ = IDNode::Create($1); }
+    | STRING 
+    | TRUE
+    | FALSE
+    | NULL_T 
     ;
 
-new_expr : NEW type { $$ = Node::make_list(3, IDNode::Create("new"), $2, Node::Create()); }
-         | NEW type '(' call_args ')'  { $$ = Node::make_list(3, IDNode::Create("new"), $2, Node::Create($4)); }
-         | new_expr '[' call_args ']' { $$ = $1; $1->addBrother(Node::Create($3)); }
-         ;
+new_expr 
+    : NEW type 
+    | NEW type '(' call_args ')'  
+    | new_expr '[' call_args ']' 
+    ;
 
-delete_expr : DELETE expr { $$ = Node::make_list(2, IDNode::Create("delete"), $2); }
-            | DELETE '[' ']' expr { $$ = Node::make_list(2, IDNode::Create("delete[]"), $4); }
+delete_expr : DELETE expr 
             ;
 
 expr 
-	: expr '=' expr { $$ = Node::make_list(4, IDNode::Create("opt2"), IDNode::Create("="), $1, $3); }
-	| expr MOV expr { $$ = Node::make_list(4, IDNode::Create("opt2"), IDNode::Create(":="), $1, $3); }
-	| expr '(' call_args ')' { $$ = Node::make_list(2, IDNode::Create("call"), $1); $$->addBrother($3); }
-    | expr '[' call_args ']' { $$ = Node::make_list(2, IDNode::Create("select"), $1); $$->addBrother($3); } 
+	: expr '=' expr 
+	| expr MOV expr 
+	| expr '(' call_args ')' 
+    | expr '[' call_args ']'  
     | new_expr
     | var_exp
-    | expr CEQ expr { $$ = Node::make_list(4, IDNode::Create("opt2"), IDNode::Create("=="), $1, $3); }
-    | expr CNE expr { $$ = Node::make_list(4, IDNode::Create("opt2"), IDNode::Create("!="), $1, $3); }
-    | expr CLE expr { $$ = Node::make_list(4, IDNode::Create("opt2"), IDNode::Create("<="), $1, $3); }
-    | expr CGE expr { $$ = Node::make_list(4, IDNode::Create("opt2"), IDNode::Create(">="), $1, $3); }
-    | expr '<' expr { $$ = Node::make_list(4, IDNode::Create("opt2"), IDNode::Create("<"), $1, $3); }
-    | expr '>' expr { $$ = Node::make_list(4, IDNode::Create("opt2"), IDNode::Create(">"), $1, $3); }
-    | expr '<' '<' expr { $$ = Node::make_list(4, IDNode::Create("opt2"), IDNode::Create("<<"), $1, $3); }
-    | expr '>' '>' expr { $$ = Node::make_list(4, IDNode::Create("opt2"), IDNode::Create(">>"), $1, $3); }
-    | expr '+' expr { $$ = Node::make_list(4, IDNode::Create("opt2"), IDNode::Create("+"), $1, $3); }
-    | expr '-' expr { $$ = Node::make_list(4, IDNode::Create("opt2"), IDNode::Create("-"), $1, $3); }
-    | expr '*' expr { $$ = Node::make_list(4, IDNode::Create("opt2"), IDNode::Create("*"), $1, $3); }
-    | expr '/' expr { $$ = Node::make_list(4, IDNode::Create("opt2"), IDNode::Create("/"), $1, $3); }
-    | expr '%' expr { $$ = Node::make_list(4, IDNode::Create("opt2"), IDNode::Create("%"), $1, $3); }
-    | expr '^' expr { $$ = Node::make_list(4, IDNode::Create("opt2"), IDNode::Create("^"), $1, $3); }
-    | expr '&' expr { $$ = Node::make_list(4, IDNode::Create("opt2"), IDNode::Create("&"), $1, $3); }
-    | expr '|' expr { $$ = Node::make_list(4, IDNode::Create("opt2"), IDNode::Create("|"), $1, $3); }
-    | expr PE expr { $$ = Node::make_list(4, IDNode::Create("opt2"), IDNode::Create("+="), $1, $3); }
-    | expr SE expr { $$ = Node::make_list(4, IDNode::Create("opt2"), IDNode::Create("-="), $1, $3); }
-    | expr ME expr { $$ = Node::make_list(4, IDNode::Create("opt2"), IDNode::Create("*="), $1, $3); }
-    | expr DE expr { $$ = Node::make_list(4, IDNode::Create("opt2"), IDNode::Create("/="), $1, $3); }
-    | expr MODE expr { $$ = Node::make_list(4, IDNode::Create("opt2"), IDNode::Create("%="), $1, $3); }
-    | expr XE expr { $$ = Node::make_list(4, IDNode::Create("opt2"), IDNode::Create("^="), $1, $3); }
-    | expr AE expr { $$ = Node::make_list(4, IDNode::Create("opt2"), IDNode::Create("&="), $1, $3); }
-    | expr OE expr { $$ = Node::make_list(4, IDNode::Create("opt2"), IDNode::Create("|="), $1, $3); }
-    | expr FLE expr { $$ = Node::make_list(4, IDNode::Create("opt2"), IDNode::Create("<<="), $1, $3); }
-    | expr FRE expr { $$ = Node::make_list(4, IDNode::Create("opt2"), IDNode::Create(">>="), $1, $3); }
-    | expr '.' expr { $$ = Node::make_list(4, IDNode::Create("opt2"), IDNode::Create("."), $1, $3); }
-    | '~' expr { $$ = Node::make_list(3, IDNode::Create("opt1"), IDNode::Create("~"), $2); }
-    | '!' expr { $$ = Node::make_list(3, IDNode::Create("opt1"), IDNode::Create("!"), $2); }
-    | PP expr { $$ = Node::make_list(3, IDNode::Create("opt1"), IDNode::Create("++"), $2); }
-    | SS expr { $$ = Node::make_list(3, IDNode::Create("opt1"), IDNode::Create("--"), $2); }
-    | expr PP { $$ = Node::make_list(3, IDNode::Create("opt1"), IDNode::Create("b++"), $1); }
-    | expr SS { $$ = Node::make_list(3, IDNode::Create("opt1"), IDNode::Create("b--"), $1); }
-    | '(' expr ')'  /* ( expr ) */  { $$ = $2; }
+    | expr CEQ expr 
+    | expr CNE expr 
+    | expr CLE expr 
+    | expr CGE expr 
+    | expr '<' expr 
+    | expr '>' expr 
+    | expr '<' '<' expr 
+    | expr '>' '>' expr 
+    | expr '+' expr 
+    | expr '-' expr 
+    | expr '*' expr 
+    | expr '/' expr 
+    | expr '%' expr 
+    | expr '^' expr 
+    | expr '&' expr 
+    | expr '|' expr 
+    | expr PE expr 
+    | expr SE expr 
+    | expr ME expr 
+    | expr DE expr 
+    | expr MODE expr 
+    | expr XE expr 
+    | expr AE expr 
+    | expr OE expr 
+    | expr FLE expr 
+    | expr FRE expr 
+    | expr '.' expr 
+    | '~' expr 
+    | '!' expr 
+    | PP expr 
+    | SS expr 
+    | expr PP 
+    | expr SS 
+    | '(' expr ')'  /* ( expr ) */  
     ;
 
-call_arg  :  expr { $$ = $1;  }
-          |  ID '=' expr { $$ = Node::make_list(3, IDNode::Create("="), $1, $3); }
+call_arg  :  expr 
+          |  ID '=' expr 
           ;
 
-call_args : %empty { $$ = NULL; }
-          | call_arg { $$ = Node::getList($1); }
-          | call_args ',' call_arg  { $$ = $1; $$->addBrother(Node::getList($3)); }
+call_args : %empty 
+          | call_arg 
+          | call_args ',' call_arg  
           ;
 
 %%
