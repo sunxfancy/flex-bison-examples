@@ -1,5 +1,4 @@
 *.cpp
 *.hpp
-*.h
 *.output
 simple-cpp

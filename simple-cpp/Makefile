@@ -3,8 +3,8 @@ OPT = -O3
 simple-cpp: lexer.cpp parser.cpp
 	$(CC) $(OPT) $^ -o $@
 
-lexer.h lexer.cpp: lexer.l
-	flex --header-file=lexer.h -o lexer.cpp lexer.l 
+lexer.hpp lexer.cpp: lexer.l
+	flex --header-file=lexer.hpp -o lexer.cpp lexer.l 
 
-parser.h parser.cpp: parser.y
+parser.hpp parser.cpp: parser.y
 	bison -d -v -o parser.cpp parser.y

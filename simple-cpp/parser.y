@@ -7,7 +7,7 @@
 %{
  #include <stdio.h>
  #include <stdlib.h>
- #include "lexer.h"
+ #include "lexer.hpp"
  void yyerror(const char *msg);
 
 class Data {
