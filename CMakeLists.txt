@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.5)
 project(Flex-Bison-Example)
 
-add_subdirectory(reentrant-variant-cpp)
 add_subdirectory(elite2)
+add_subdirectory(reentrant-variant-cpp)
+add_subdirectory(reentrant-c)
+add_subdirectory(simple-cpp)
+add_subdirectory(simple-c)

@@ -12,7 +12,7 @@
 %name-prefix="yy"
 
 /* set the parser's class identifier */
-%define "parser_class_name" "Parser"
+%define api.parser.class {Parser}
 
 /* it will generate a location class which can be used in your lexer */
 %locations
