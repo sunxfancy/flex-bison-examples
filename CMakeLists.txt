@@ -6,3 +6,6 @@ add_subdirectory(reentrant-variant-cpp)
 add_subdirectory(reentrant-c)
 add_subdirectory(simple-cpp)
 add_subdirectory(simple-c)
+add_subdirectory(utf8)
+add_subdirectory(error-recovery)
+
