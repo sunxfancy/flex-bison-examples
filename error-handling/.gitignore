@@ -1,0 +1,5 @@
+*.o
+lex.c
+parse.c
+parse.h
+ccalc
