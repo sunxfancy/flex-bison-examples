@@ -2,7 +2,7 @@ CC = gcc
 STD = -std=c11
 OPT = -O3
 
-reentrant-c: lexer.o parser.o reentrant_parser.o 
+optional-semicolon: lexer.o parser.o sliplist.o
 	$(CC) $^ -o $@
 
 lexer.h lexer.c: lexer.l parser.h 

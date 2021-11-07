@@ -1,0 +1,11 @@
+
+
+defun work(name) {
+        
+    printf("hello world ~ %s\n", name)
+  
+    printf("optional semicolon example");
+   
+}
+
+work("xiaofan")
