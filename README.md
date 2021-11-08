@@ -12,3 +12,8 @@ There are several topics in this list:
 
 Makefile and CMakeLists are provided to build the project. Please install the newest flex/bison in your system.
 
+
+
+在这个项目的wiki中我将介绍一下这些问题是如何被解决的，以及背后的一些实现思路。
+
+[Bison中句尾可选分号的实现](https://github.com/sunxfancy/flex-bison-examples/wiki/Bison%E5%AE%9E%E7%8E%B0%E5%8F%A5%E5%B0%BE%E7%9A%84%E5%8F%AF%E9%80%89%E5%88%86%E5%8F%B7-Optional-semicolon-grammar-in-Bison)
