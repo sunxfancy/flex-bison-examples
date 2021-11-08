@@ -247,8 +247,8 @@ start:  yyn = yypact[yystate];
             /* default action */
 defact:     yyn = yydefact[yystate];
             if (yyn == 0) { 
-                /* return yylex(); */
-                do yychar = yylex(); while (yychar == '\n'); 
+                do { yychar = yylex(); printf("%d\n", yychar); } while (yychar == '\n'); 
+                printf("jump to next: %d\n", yychar);
                 return yychar;
             }
             else goto reduce;
@@ -263,8 +263,10 @@ reduce:         yyssp -= yyr2[yyn];
                 yystate = (0 <= yyi && yyi <= YYLAST && yycheck[yyi] == *yyssp
                         ? yytable[yyi]
                         : yydefgoto[yylhs]);
+                yyssp++;
                 goto start;
             } else { // shift case
+                printf("emit ;\n");
                 return ';'; 
             }
         }
@@ -272,7 +274,6 @@ reduce:         yyssp -= yyr2[yyn];
     }
     return yychar;
 }
-
 
 int main(int argc,const char *argv[]) {
     const char *file_in_name = argv[1];
