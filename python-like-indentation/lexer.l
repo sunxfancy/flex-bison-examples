@@ -59,7 +59,7 @@ HEXDIGIT [0-9a-fA-F]
                             printf("Error at line %d: illegal indentation %d %d\n", yylloc.first_line,
                                     current_line_indent, indent_level); exit(0);
                         }
-                        current_line_indent = current_line_indent - 4;
+                        indent_level -= 4;
                         printf("dedent: %d\n", current_line_indent);
                         return DEDENT;
                     } else {
@@ -73,7 +73,7 @@ HEXDIGIT [0-9a-fA-F]
                             printf("Error at line %d: illegal indentation %d %d\n", yylloc.first_line,
                                     current_line_indent, indent_level); exit(0);
                         }
-                        indent_level = indent_level - 4;
+                        indent_level -= 4;
                         printf("dedent: %d\n", current_line_indent);
                         return DEDENT;
                     } else return YYEOF;
