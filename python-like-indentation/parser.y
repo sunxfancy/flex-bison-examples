@@ -149,8 +149,8 @@ block
     ;
 
 statements 
-    : statement ';'
-    | statements  statement ';' { $$ = $1; add($1, $2); }
+    : statement 
+    | statements  statement { $$ = $1; add($1, $2); }
     ;
 
 statement 
@@ -161,8 +161,8 @@ statement
     | defun_state       { $$ = List($1); }
     | defmacro_state    { $$ = List($1); }
     | src_list
-    | expr              { $$ = List($1); }
-    | assign_state  
+    | expr         ';'  { $$ = List($1); }
+    | assign_state ';'  { $$ = $1; }
     ;
 
 assign_state 
@@ -170,8 +170,8 @@ assign_state
     ;
 
 for_state 
-    : FOR TID IN expr block          { $$ = List(mkl(5, ID("for"), ID($2), 0,      ID($4), $5)); }
-    | FOR TID ',' TID IN expr block  { $$ = List(mkl(5, ID("for"), ID($2), ID($4), ID($6), $7)); }
+    : FOR TID IN expr block          { $$ = List(mkl(5, ID("for"), ID($2), ID("nil"), List($4), $5)); }
+    | FOR TID ',' TID IN expr block  { $$ = List(mkl(5, ID("for"), ID($2), ID($4), List($6), $7)); }
     ;
 
 if_state 
@@ -196,12 +196,12 @@ defargs
 
 defun_state 
     : DEFUN TID '(' defargs ')' block   { $$ = mkl(3, ID("defun"), ID($2), List($4)); concat($$, $6); }
-    | DEFUN '(' defargs ')' block       { $$ = mkl(3, ID("defun"), 0, List($3)); concat($$, $5); }
+    | DEFUN '(' defargs ')' block       { $$ = mkl(3, ID("defun"), ID("nil"), List($3)); concat($$, $5); }
     ;
 
 defmacro_state 
     : DEFMACRO TID '(' defargs ')' block    { $$ = mkl(3, ID("defmacro"), ID($2), List($4)); concat($$, $6);}
-    | DEFMACRO '(' defargs ')' block        { $$ = mkl(3, ID("defun"), 0, List($3)); concat($$, $5); }
+    | DEFMACRO '(' defargs ')' block        { $$ = mkl(3, ID("defun"), ID("nil"),  List($3)); concat($$, $5); }
     ;
 
 %%
@@ -221,7 +221,7 @@ int main(int argc,const char *argv[]) {
 
 
 int yyfilter(int yychar, int yyn, int yystate, yy_state_t *yyssp) {
-    if (yychar == '\n') {
+    if (yychar == '\n' || yychar == YYEOF) {
         yysymbol_kind_t yytoken = YYTRANSLATE (';');
 
 start:  yyn = yypact[yystate];
@@ -231,7 +231,7 @@ start:  yyn = yypact[yystate];
             /* default action */
 defact:     yyn = yydefact[yystate];
             if (yyn == 0) { 
-                do { yychar = yylex(); printf("%d\n", yychar); } while (yychar == '\n'); 
+                do { yychar = yylex(); } while (yychar == '\n'); 
                 printf("jump to next: %d\n", yychar);
                 return yychar;
             }

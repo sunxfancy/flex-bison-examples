@@ -214,12 +214,12 @@ defargs
 
 defun_state 
     : DEFUN TID '(' defargs ')' block   { $$ = mkl(3, ID("defun"), ID($2), List($4)); concat($$, $6); }
-    | DEFUN '(' defargs ')' block       { $$ = mkl(3, ID("defun"), 0, List($3)); concat($$, $5); }
+    | DEFUN '(' defargs ')' block       { $$ = mkl(3, ID("defun"), ID("nil"), List($3)); concat($$, $5); }
     ;
 
 defmacro_state 
     : DEFMACRO TID '(' defargs ')' block    { $$ = mkl(3, ID("defmacro"), ID($2), List($4)); concat($$, $6);}
-    | DEFMACRO '(' defargs ')' block        { $$ = mkl(3, ID("defun"), 0, List($3)); concat($$, $5); }
+    | DEFMACRO '(' defargs ')' block        { $$ = mkl(3, ID("defun"), ID("nil"), List($3)); concat($$, $5); }
     ;
 
 %%

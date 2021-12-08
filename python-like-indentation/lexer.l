@@ -39,14 +39,16 @@ HEXDIGIT [0-9a-fA-F]
 
 " "      { printf("space\n"); current_line_indent++; }
 "\t"     { printf("tab\n"); current_line_indent = (current_line_indent + 4) & ~3; }
-"\n"     { printf("enter\n"); current_line_indent = 0; /*ignoring blank line */ }
-.        {
+"\n"     { printf("enter\n"); current_line_indent = 0; return '\n'; }
+. {
                     printf("indentation\n");
                     unput(*yytext);
-                    BEGIN(NORMAL);
+                    
                     if (current_line_indent > indent_level) {
                         if (current_line_indent == indent_level + 4) {
                             indent_level = current_line_indent;
+                            BEGIN(NORMAL);
+                            printf("indent: %d\n", current_line_indent);
                             return INDENT;
                         } else {
                             printf("Error at line %d: illegal indentation %d %d\n", yylloc.first_line,
@@ -58,12 +60,27 @@ HEXDIGIT [0-9a-fA-F]
                                     current_line_indent, indent_level); exit(0);
                         }
                         current_line_indent = current_line_indent - 4;
+                        printf("dedent: %d\n", current_line_indent);
                         return DEDENT;
-                    } 
+                    } else {
+                        BEGIN(NORMAL);
+                    }
+                }
+
+<<EOF>>         {
+                    if (current_line_indent < indent_level) {
+                        if (indent_level - current_line_indent < 4) {
+                            printf("Error at line %d: illegal indentation %d %d\n", yylloc.first_line,
+                                    current_line_indent, indent_level); exit(0);
+                        }
+                        indent_level = indent_level - 4;
+                        printf("dedent: %d\n", current_line_indent);
+                        return DEDENT;
+                    } else return YYEOF;
                 }
 
 <NORMAL>{
-    "\n"                    { printf("next line\n"); current_line_indent = 0; BEGIN(INITIAL); }
+    "\n"                    { printf("next line\n"); current_line_indent = 0; BEGIN(INITIAL);  return '\n'; }
     " "                     
     /* 界符 */
     [()\[\]{}.:`;]          {return *yytext;}
