@@ -19,6 +19,7 @@ Makefile and CMakeLists are provided to build the project. Please install the ne
 * reentrant-c 可重入版的C代码版，适合普通C工程使用，避免全局变量的使用，便于多线程安全调用
 * reentrant-variant-cpp C++工程版示例，避免全局变量的使用，并且使用variant替代union，可以在parser中方便地使用各种带构造函数的类型
 * optional-semicolon 目前效果最好的可选分号实现，目前是基于基础C代码版，只做思路上的实现，实际应用时请根据需要修改裁剪，同时这个语言设计也是取自我之前写的脚本语言slip，可以用作语言设计的参考
+* python-like-indentation 一个类似python的语法，改自optional-semicolon，实现了缩进确定block和可选分号的效果，同时也展示了flex start condition的用法
 * elite2 一个较完整的语法示例，但没有具体的语义分析部分，设计取自我之前写的elite编程语言第二版
 * utf-8  使用flex支持utf-8和中文词语法的示例，代码中原生支持中文，或者做游戏引擎时制作脚本引擎，中文支持还是非常有用的
 * error-recovery 异常恢复的基本操作，使用error关键词来匹配到下一个合法的token，这里展示了其基本用法。
