@@ -10,14 +10,12 @@
 char* maketoken(const char* data, int len);
 char* makestring(const char* data, int len, int s);
 
-#ifdef _WIN32
-
 /*windows compatibility case*/  
-#define YY_NO_UNISTD_H
-#include <io.h>  
-#define isatty _isatty  
-#define fileno _fileno  
-
+#ifdef _WIN32
+#  define YY_NO_UNISTD_H
+#  include <io.h>  
+#  define isatty _isatty  
+#  define fileno _fileno  
 #endif
 
 %}
