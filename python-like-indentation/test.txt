@@ -2,5 +2,9 @@
 defun work(name)
  	for i in range(1, 30)
   	    print(i)
+		
+		a = a + b + c + 
+				q + parse(1, 2)
+		print(q)
 
 

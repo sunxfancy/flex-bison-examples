@@ -9,6 +9,8 @@
 union slip_Node *programBlock; /* the top level root node of our final AST */
 
 extern int yylex();
+extern void myunput(char c);
+extern void beginIndent();
 extern int yylineno;
 extern char* yytext;
 extern int yyleng;
@@ -120,15 +122,15 @@ exprss
     ;
 
 expr 
-    : expr '+' expr { $$ = mkl(3, ID("+"), $1, $3); }
-    | expr '-' expr { $$ = mkl(3, ID("-"), $1, $3); }
-    | expr '*' expr { $$ = mkl(3, ID("*"), $1, $3); }
-    | expr '/' expr { $$ = mkl(3, ID("/"), $1, $3); }
-    | expr '=' expr { $$ = mkl(3, ID("="), $1, $3); }
+    : expr '+' expr { $$ = List(mkl(3, ID("+"), $1, $3)); }
+    | expr '-' expr { $$ = List(mkl(3, ID("-"), $1, $3)); }
+    | expr '*' expr { $$ = List(mkl(3, ID("*"), $1, $3)); }
+    | expr '/' expr { $$ = List(mkl(3, ID("/"), $1, $3)); }
+    | expr '=' expr { $$ = List(mkl(3, ID("="), $1, $3)); }
     | '(' exprs ')'  { $$ = $2; }
     | value
-    | call_state
-    | select_state
+    | call_state    { $$ = List($1); }
+    | select_state  { $$ = List($1); }
     ;
 
 call_state 
@@ -145,7 +147,7 @@ select_state
 /* ---------------- Statements --------------- */
 
 block 
-    : INDENT statements DEDENT { $$ = $2; }
+    : INDENT statements DEDENT { $$ = List($2); }
     ;
 
 statements 
@@ -160,18 +162,18 @@ statement
     | ret_state         { $$ = List($1); }
     | defun_state       { $$ = List($1); }
     | defmacro_state    { $$ = List($1); }
-    | src_list
     | expr         ';'  { $$ = List($1); }
     | assign_state ';'  { $$ = $1; }
+    | src_list
     ;
 
 assign_state 
-    : exprss '=' exprss { $$ = List(mkl(3, ID("="), $1, $3)); }
+    : exprss '=' exprss { $$ = List(mkl(3, ID("="), List($1), List($3))); }
     ;
 
 for_state 
-    : FOR TID IN expr block          { $$ = List(mkl(5, ID("for"), ID($2), ID("nil"), List($4), $5)); }
-    | FOR TID ',' TID IN expr block  { $$ = List(mkl(5, ID("for"), ID($2), ID($4), List($6), $7)); }
+    : FOR TID IN expr block          { $$ = mkl(5, ID("for"), ID($2), ID("nil"), $4, $5); }
+    | FOR TID ',' TID IN expr block  { $$ = mkl(5, ID("for"), ID($2), ID($4), $6, $7); }
     ;
 
 if_state 
@@ -220,10 +222,9 @@ int main(int argc,const char *argv[]) {
 }
 
 
-int yyfilter(int yychar, int yyn, int yystate, yy_state_t *yyssp) {
-    if (yychar == '\n' || yychar == YYEOF) {
-        yysymbol_kind_t yytoken = YYTRANSLATE (';');
-
+static int try_symbol(int yychar, int yyn, int yystate, yy_state_t *yyssp, int symbol)
+{
+    yysymbol_kind_t yytoken = YYTRANSLATE (symbol);
 start:  yyn = yypact[yystate];
         if (yypact_value_is_default (yyn)) goto defact;
         yyn += yytoken;
@@ -231,9 +232,7 @@ start:  yyn = yypact[yystate];
             /* default action */
 defact:     yyn = yydefact[yystate];
             if (yyn == 0) { 
-                do { yychar = yylex(); } while (yychar == '\n'); 
-                printf("jump to next: %d\n", yychar);
-                return yychar;
+                return -1;
             }
             else goto reduce;
         } else { // table contains action
@@ -250,11 +249,29 @@ reduce:         yyssp -= yyr2[yyn];
                 yyssp++;
                 goto start;
             } else { // shift case
-                printf("emit ;\n");
-                return ';'; 
+                printf("emit symbol\n");
+                return symbol; 
             }
         }
-        return ';';
+}
+
+int yyfilter(int yychar, int yyn, int yystate, yy_state_t *yyssp) {
+    if (yychar == '\n' || yychar == YYEOF) {
+        /* do we need a ';' ? */
+        int r = try_symbol(yychar, yyn, yystate, yyssp, ';');
+        if (r != -1) { printf("unput \\n"); myunput('\n'); return r; }
+        
+        /* do we need a INDENT or DEDENT ? */
+        r = try_symbol(yychar, yyn, yystate, yyssp, INDENT);
+        if (r != -1) { printf("unput \\n"); myunput('\n'); beginIndent(); return yylex(); }
+
+        r = try_symbol(yychar, yyn, yystate, yyssp, DEDENT);
+        if (r != -1) { printf("unput \\n"); myunput('\n'); beginIndent(); return yylex(); }
+
+        do { yychar = yylex(); } while (yychar == '\n'); 
+        printf("jump to next: %d\n", yychar);
+        return yychar;
+
     }
     return yychar;
 }

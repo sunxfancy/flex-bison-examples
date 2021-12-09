@@ -39,7 +39,7 @@ HEXDIGIT [0-9a-fA-F]
 
 " "      { printf("space\n"); current_line_indent++; }
 "\t"     { printf("tab\n"); current_line_indent = (current_line_indent + 4) & ~3; }
-"\n"     { printf("enter\n"); current_line_indent = 0; return '\n'; }
+"\n"     { printf("enter\n"); current_line_indent = 0; }
 . {
                     printf("indentation\n");
                     unput(*yytext);
@@ -63,6 +63,7 @@ HEXDIGIT [0-9a-fA-F]
                         printf("dedent: %d\n", current_line_indent);
                         return DEDENT;
                     } else {
+                        printf("goto normal\n");
                         BEGIN(NORMAL);
                     }
                 }
@@ -80,40 +81,40 @@ HEXDIGIT [0-9a-fA-F]
                 }
 
 <NORMAL>{
-    "\n"                    { printf("next line\n"); current_line_indent = 0; BEGIN(INITIAL);  return '\n'; }
-    " "                     
+    "\n"                    { printf("next line\n"); current_line_indent = 0; return '\n'; }
+    [ \t]                   { }                  
     /* 界符 */
-    [()\[\]{}.:`;]          {return *yytext;}
+    [()\[\]{}.:`;]          { printf("%s ",yytext);return *yytext;}
     /* 运算符 */
     [+\-*/&|^~!%=,]         {return *yytext;}
     /* 比较 */
     [><]                    {return *yytext;}
 
     /* 关键字 */
-    "for"                   { return FOR; }
-    "if"                    { return IF; }
-    "else"                  { return ELSE; }
-    "while"                 { return WHILE; }
-    "do"                    { return DO; }
-    "break"                 { return BREAK; }
-    "continue"              { return CONTINUE; }
-    "return"                { return RETURN; }
-    "in"                    { return IN; }
-    "defun"                 { return DEFUN; }
-    "defmacro"              { return DEFMACRO; }
-    "class"                 { return CLASS; }
-    "var"                   { return VAR; }
+    "for"                   { printf("for "      ); return FOR; }
+    "if"                    { printf("if "       ); return IF; }
+    "else"                  { printf("else "     ); return ELSE; }
+    "while"                 { printf("while "    ); return WHILE; }
+    "do"                    { printf("do "       ); return DO; }
+    "break"                 { printf("break "    ); return BREAK; }
+    "continue"              { printf("continue " ); return CONTINUE; }
+    "return"                { printf("return "   ); return RETURN; }
+    "in"                    { printf("in "       ); return IN; }
+    "defun"                 { printf("defun "    ); return DEFUN; }
+    "defmacro"              { printf("defmacro " ); return DEFMACRO; }
+    "class"                 { printf("class "    ); return CLASS; }
+    "var"                   { printf("var "      ); return VAR; }
 
-    "true"                  { return T_TRUE; }
-    "false"                 { return T_FALSE; }
-    "nil"                   { return T_NIL; }
-    "<="                    { return LTE; }
-    ">="                    { return GTE; }
-    "=="                    { return EQ; }
-    "!="                    { return NE; }
+    "true"                  { printf("true "     ); return T_TRUE; }
+    "false"                 { printf("false "    ); return T_FALSE; }
+    "nil"                   { printf("nil "      ); return T_NIL; }
+    "<="                    { printf("<="        ); return LTE; }
+    ">="                    { printf(">="        ); return GTE; }
+    "=="                    { printf("=="        ); return EQ; }
+    "!="                    { printf("!="        ); return NE; }
 
     /* 标识符 */
-    [a-zA-Z_][a-zA-Z0-9_]*  {SAVE_TOKEN; return TID; }
+    [a-zA-Z_][a-zA-Z0-9_]*  { printf("%s ",yytext); SAVE_TOKEN; return TID; }
     /* 字符串 */
     \"(\\.|[^\\"])*\"       {SAVE_STRING; return STRING; }
     \'(\\.|[^\\'])*\'       {SAVE_STRING; return STRING; }
@@ -126,6 +127,10 @@ HEXDIGIT [0-9a-fA-F]
 }
 
 %%
+
+
+void myunput(char c) { unput(c); }
+void beginIndent() { BEGIN(INITIAL); }
 
 char* maketoken(const char* data, int len) {
     char* str = (char*) malloc(len+1);
