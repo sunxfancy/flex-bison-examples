@@ -8,6 +8,7 @@ There are several topics in this list:
 4. UTF-8 support - flex is hard to implement utf-8 but I do need Chinese!
 5. Error recovery - the most difficult thing in bison 
 6. Better error message - IBM has an old but nice article to show how to achieve it: https://developer.ibm.com/tutorials/l-flexbison/
+7. Indentation - python-like grammar is always a hard topic in flex, we will show how to achieve it.
 
 
 Makefile and CMakeLists are provided to build the project. Please install the newest flex/bison in your system.
