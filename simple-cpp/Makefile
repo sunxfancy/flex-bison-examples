@@ -1,5 +1,5 @@
 CC = g++
-OPT = -O3
+OPT = -O3 -std=c++11
 simple-cpp: lexer.cpp parser.cpp
 	$(CC) $(OPT) $^ -o $@
 
