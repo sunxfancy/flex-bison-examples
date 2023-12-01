@@ -63,6 +63,13 @@ Error recovery example， it can parse all lines and output the error messages f
 91 * ) ( - 3 =
 ```
 
+Other My Projects using flex/bison could be a reference:
+
+* [FSMLanuage](https://github.com/sunxfancy/FSMLanguage)
+* [UMake](https://github.com/sunxfancy/UMake)
+* [RedApple](https://github.com/elite-lang/RedApple)
+* [MiniC](https://github.com/sunxfancy/miniC)
+* [LR_Scanner](https://github.com/elite-lang/LR_Scanner)
 
 目前拥有的示例：
 
