@@ -1,6 +1,20 @@
 # Flex/Bison Examples
 
 
+## Tool versions and modern example
+
+Upstream NEWS checked on 2026-10-16 still lists **Flex 2.6.4** (2017-05-06)
+and **Bison 3.8.2** (2021-09-25) as the latest stable releases; development
+changes above these entries are unreleased:
+[Flex NEWS](https://github.com/westes/flex/blob/master/NEWS),
+[Bison NEWS](https://github.com/akimd/bison/blob/master/NEWS).
+The older examples are not all written for the latest Bison API.
+
+新增 [`modern-cpp`](modern-cpp/)：面向 Flex 2.6.4、Bison 3.8+、C++17 的计算器，
+包含可重入扫描器、variant/token constructor、RAII、位置跟踪、detailed 错误提示与 LAC。
+提供独立 Make/CMake 构建；其他示例保留原有写法，便于对照。
+截至 2026-10-16，上游最新稳定版仍为上述版本，不能仅凭发布时间较早判断已经过时。
+
 Here is a list of flex/bison examples to show some advanced features in the newest versions of flex/bison. 
 There are several topics in this list:
 1. Reentrancy - this is important for parsing in multithread programs 
