@@ -11,3 +11,4 @@ add_subdirectory(error-recovery)
 add_subdirectory(optional-semicolon)
 add_subdirectory(python-like-indentation)
 
+add_subdirectory(modern-cpp)
