@@ -50,9 +50,9 @@ python3 modern-cpp/test.py modern-cpp/build/modern-cpp
 Run this command from the repository root after either build above (for the
 standalone CMake path, pass `build/modern-cpp/modern-cpp` instead).
 Tests check results, exit codes, and diagnostics for valid and invalid input.
-GitHub Actions runs both Make and CMake on Ubuntu 22.04 and 24.04 for pushes and
+GitHub Actions runs both Make and CMake on Ubuntu 24.04 for pushes and
 pull requests; it can also be triggered manually.
 
 在仓库根目录执行上述命令；若按前面的 CMake 路径构建，则传入
-`build/modern-cpp/modern-cpp`。CI 在两个 Ubuntu 版本上分别构建并测试两种构建方式，
+`build/modern-cpp/modern-cpp`。CI 在 Ubuntu 24.04 上分别构建并测试两种构建方式，
 覆盖运算优先级、小数、换行格式、错误位置、除零及不完整输入。

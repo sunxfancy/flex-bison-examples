@@ -10,13 +10,12 @@ permissions:
 
 jobs:
   build-and-test:
-    name: ${{ matrix.os }} / ${{ matrix.build }}
-    runs-on: ${{ matrix.os }}
+    name: Ubuntu 24.04 / ${{ matrix.build }}
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04, ubuntu-24.04]
         build: [make, cmake]
     steps:
       - uses: actions/checkout@v4
