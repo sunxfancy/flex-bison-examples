@@ -1,0 +1,38 @@
+name: Modern C++ example
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    name: ${{ matrix.os }} / ${{ matrix.build }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, ubuntu-24.04]
+        build: [make, cmake]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y flex bison g++ make cmake python3
+          flex --version
+          bison --version
+      - name: Build with Make
+        if: matrix.build == 'make'
+        run: make -C modern-cpp -j2
+      - name: Build with CMake
+        if: matrix.build == 'cmake'
+        run: |
+          cmake -S modern-cpp -B modern-cpp/build -DCMAKE_BUILD_TYPE=Release
+          cmake --build modern-cpp/build --parallel 2
+      - name: Test calculator
+        run: python3 modern-cpp/test.py modern-cpp/build/modern-cpp
