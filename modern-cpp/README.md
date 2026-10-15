@@ -56,3 +56,16 @@ pull requests; it can also be triggered manually.
 在仓库根目录执行上述命令；若按前面的 CMake 路径构建，则传入
 `build/modern-cpp/modern-cpp`。CI 在 Ubuntu 24.04 上分别构建并测试两种构建方式，
 覆盖运算优先级、小数、换行格式、错误位置、除零及不完整输入。
+
+## Code guide / 代码导读
+
+`parser.y` defines the C++ API and arithmetic grammar; `lexer.l` returns typed
+tokens and tracks locations; `main.cpp` owns the scanner with RAII. `test.py`
+checks valid results and error behavior. Both build files generate parser/scanner
+sources into the build directory.
+
+`parser.y` 定义 C++ 接口和算术语法，`lexer.l` 返回带类型的 token 并跟踪位置，
+`main.cpp` 用 RAII 管理扫描器，`test.py` 检查计算结果及错误行为。
+两种构建方式均将生成代码放入构建目录。
+
+[All examples / 所有示例](../README.md)
