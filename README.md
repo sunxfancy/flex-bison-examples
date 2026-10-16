@@ -1,6 +1,24 @@
 # Flex/Bison Examples
 
 
+## Directory guides / 目录说明
+
+Each source directory has English and Chinese instructions. / 各源码目录均提供中英文说明。
+
+- [simple-c](simple-c/README.md)
+- [simple-cpp](simple-cpp/README.md)
+- [reentrant-c](reentrant-c/README.md)
+- [reentrant-variant-cpp](reentrant-variant-cpp/README.md)
+- [modern-cpp](modern-cpp/README.md)
+- [optional-semicolon](optional-semicolon/README.md)
+- [python-like-indentation](python-like-indentation/README.md)
+- [elite2](elite2/README.md)
+- [utf8](utf8/README.md)
+- [error-recovery](error-recovery/README.md)
+- [error-handling](error-handling/README.md)
+- [docs](docs/README.md)
+- [.github](.github/README.md)
+
 ## Tool versions and modern example
 
 Upstream NEWS checked on 2026-10-16 still lists **Flex 2.6.4** (2017-05-06)
